@@ -58,7 +58,7 @@ baterai = {
     baterai: 0,
     cas: false
 }
-public = false
+public = true
 autoread = true
 autovn = false
 autotype = false
@@ -340,9 +340,18 @@ const isQuotedVideo = type === 'extendedTextMessage' && content.includes('videoM
 const isQuotedAudio = type === 'extendedTextMessage' && content.includes('audioMessage')
 const isQuotedSticker = type === 'extendedTextMessage' && content.includes('stickerMessage')
 const isQuotedDocument = type === 'extendedTextMessage' && content.includes('documentMessage')
+
 if (chats.toLowerCase() === 'prefix'){
 reply(`prefix bot ini adalah = ${prefix}`)
 }
+//Contoh Respon VN
+if (budy.includes('Bot')) {
+fa =['./cahce/fa.mp3','./cahce/faa.mp3','./cahce/faaa.mp3']
+fafa = fa[Math.floor(Math.random() * fa.length)]
+suarafa = fs.readFileSync(fafa);
+udin.sendMessage(from, suarafa, MessageType.audio, {quoted: din, mimetype: 'audio/mp4', ptt:true})
+}
+
 if (isMybot){
 if (chats.startsWith('>')){
 console.log(color('[EVAL]'), color(moment(din.messageTimestamp * 1000).format('DD/MM/YY HH:mm:ss'), 'yellow'), color(`Eval V2 brooo`))
@@ -537,6 +546,19 @@ sendStickerFromUrl(from, `${anu1}`, mess.success)
 reply('Gunakan foto!')
 }
 break
+case 'sss':
+var imgbb = require('imgbb-uploader')
+if ((isMedia && !din.message.videoMessage || isQuotedImage || isQuotedSticker)) {
+ger = isQuotedImage || isQuotedSticker ? JSON.parse(JSON.stringify(din).replace('quotedM','m')).message.extendedTextMessage.contextInfo : din
+owgi = await  udin.downloadAndSaveMediaMessage(ger)
+anu = await imgbb("f0b190d67308d34811fab9c56fe8aba7", owgi)
+tekks = `${anu.display_url}`
+anu1 = `${tekks}`
+sendStickerFromUrl(from, `${anu1}`, mess.success)
+} else {
+reply('Gunakan foto!')
+}
+break
 case 'communism':
 var imgbb = require('imgbb-uploader')
 if ((isMedia && !din.message.videoMessage || isQuotedImage || isQuotedSticker)) {
@@ -633,6 +655,13 @@ DOWNLOAD MENU
 ⿻${prefix}play
 ⿻${prefix}video
 
+CMD STICKER
+⿻${prefix}setcmd
+⿻${prefix}delcmd
+
+QUOTED
+⿻${prefix}q
+
 ONLY OWNER
 ⿻${prefix}self
 ⿻${prefix}public
@@ -690,7 +719,7 @@ Testbang = udin.prepareMessageFromContent(from, {
 break
 case 'addcmd':
 case 'setcmd':
-if (!isMybot) return reply(mess.OnlyOwner)
+//if (!isMybot) return reply(mess.OnlyOwner)
 if (isQuotedSticker) {
 if (!q) return reply(`Penggunaan : ${prefix+command} cmdnya dan tag stickernya`)
 kodenya = din.message.extendedTextMessage.contextInfo.quotedMessage.stickerMessage.fileSha256.toString('base64')
@@ -701,7 +730,7 @@ reply('tag stickenya')
 }
 break
 case 'delcmd':
-if (!isMybot) return reply(mess.OnlyOwner)
+//if (!isMybot) return reply(mess.OnlyOwner)
 if (!isQuotedSticker) return reply(`Penggunaan : ${prefix+command} tagsticker`)
 kodenya = din.message.extendedTextMessage.contextInfo.quotedMessage.stickerMessage.fileSha256.toString('base64')
 _scommand.splice(getCommandPosition(kodenya), 1)
