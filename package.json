@@ -10,9 +10,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node udin.js"
   },
-  "author": "aqulzz panutanku",
+  "author": "ZAINUDIN",
   "dependencies": {
-    "@adiwajshing/baileys": "^3.5.2",
+    "@adiwajshing/baileys": "github:adiwajshing/baileys",
     "awesome-phonenumber": "^2.52.0",
     "axios": "^0.21.1",
     "brainly-scraper": "^1.0.3",
