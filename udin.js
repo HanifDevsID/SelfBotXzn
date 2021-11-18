@@ -1,5 +1,4 @@
 /*
-GW CUMA RECODE JADI BAILEYS 3.5.2
 BASE ORI AQULZZ
 RECODE BY ZAINUDIN ANGGARA
 */
@@ -33,7 +32,9 @@ const request = require('request');
 const imgbb = require('imgbb-uploader')
 const yts = require( 'yt-search')
 const { yta, ytv, igdl, upload, uploadImages } = require('./src/ytdl')
+const { webp2gifFile, igDownloader, TiktokDownloader } = require("./src/gif.js")
 let chalk = require('chalk')
+const crypto = require('crypto')
 //dan jadilah recode base ini
 const { exec } = require('child_process');
 const xzn = require('./whatsapp/message.js');
@@ -59,7 +60,7 @@ baterai = {
     cas: false
 }
 public = true
-autoread = true
+autoread = false
 autovn = false
 autotype = false
 autoonline = false
@@ -71,6 +72,8 @@ const antilink = JSON.parse(fs.readFileSync('./database/group/antilink.json'))
 const nsfw = JSON.parse(fs.readFileSync('./database/bot/nsfw.json'))
 const datdat = JSON.parse(fs.readFileSync('./cahce/msg.data.json'))
 let _scommand = JSON.parse(fs.readFileSync('./scommand.json'));
+let _registered = JSON.parse(fs.readFileSync('./database/user/registered.json'))
+let register = JSON.parse(fs.readFileSync('./database/user/registered.json'))
 
 udin.on('CB:Blocklist', json => {
 	if (blocked.length > 2) return
@@ -197,6 +200,7 @@ const isNsfw = isGroup ? nsfw.includes(from) : false
 const isAntiLink = isGroup ? antilink.includes(from) : false
 //BEDA
 const isOwner = ownerNumber.includes(sender)
+const isRegister = register.includes(sender)
 const itsMe = din.key.fromMe ? true : false
 const isMybot = isOwner || itsMe
 const ZAINUDIN = command || butcmd || buttonCmd
@@ -216,7 +220,7 @@ const sendButon = async (from, context, fotext, but, din) => {
 buttonMessages = { contentText: context, footerText: fotext, buttons: but, headerType: 1 }
 udin.sendMessage(from, buttonMessages, buttonsMessage, { quoted: din })}
 const sendButImage = async (from, context, fotext, img, but) => {
-jadinya = await udin.prepareMessage(from, img, image, {thumbnail: fakeimage})
+jadinya = await udin.prepareMessage(from, img, image)
 buttonMessagesI = {imageMessage: jadinya.message.imageMessage, contentText: context, footerText: fotext, buttons: but, headerType: 4 }
 udin.sendMessage(from, buttonMessagesI, buttonsMessage, {quoted: din })}
 const sendButVideoh = async (from, context, fotext, vid, but) => {
@@ -277,7 +281,8 @@ mime = Mimetype.gif
 if(mime.split("/")[0] === "audio"){
 mime = Mimetype.mp4Audio
 }
-udin.sendMessage(to, media, type, { quoted: din, thumbnail: fakeimage, mimetype: mime, caption: text,contextInfo: {"mentionedJid": mids}})
+//udin.sendMessage(to, media, type, { quoted: din, thumbnail: fakeimage, mimetype: mime, caption: text,contextInfo: {"mentionedJid": mids}})
+udin.sendMessage(to, media, type, { quoted: din, mimetype: mime, caption: text,contextInfo: {"mentionedJid": mids}})
 fs.unlinkSync(filename)
 });
 }
@@ -295,7 +300,51 @@ let message = await udin.prepareMessageFromContent(participant, msg, options)
 await udin.relayWAMessage(message)
 return message
 }
-
+//regis
+const createSerial = (size) => {
+return crypto.randomBytes(size).toString('hex').slice(0, size)
+        }
+const getRegisteredRandomId = () => {
+return _registered[Math.floor(Math.random() * _registered.length)].id
+        }
+const addRegisteredUser = (userid, sender, age, time, serials) => {
+const obj = { id: userid, name: sender, age: age, time: time, serial: serials }
+_registered.push(obj)
+fs.writeFileSync('./database/user/registered.json', JSON.stringify(_registered))
+}       
+const checkRegisteredUser = (sender) => {
+            let status = false
+            Object.keys(_registered).forEach((i) => {
+                if (_registered[i].id === sender) {
+                    status = true
+                }
+            })
+            return status
+        }
+const isRegistered = checkRegisteredUser(sender)
+const sendButMessage = (id, text1, desc1, but = [], options = {}) => {
+const buttonMessage = {
+contentText: text1,
+footerText: desc1,
+        buttons: but,
+        headerType: 1,
+      };
+      udin.sendMessage(
+        id,
+        buttonMessage,
+        MessageType.buttonsMessage,
+        options
+      );
+    };
+///DAFTAR BUTTON 
+ const daftar1 = `Hai kak  ${pushname} ${ucapanWaktu}
+Sebelum Menggunakan Bot Verify Terlebih Dahulu Ya `
+ const daftar2 = `Tekan Button Di Bawah Untuk Mendaftar Kak`
+ const daftar3 = [{buttonId: `register`,buttonText: {displayText: `DAFTAR ⿻ `,
+            },
+            type: 1,
+          },]
+//tes
 const replyy = (teks) => {
 udin.sendMessage(from, teks, text, { quoted: din, contextInfo: { externalAdReply: { title: `${wita} - ${week} ${weton}\n${date}`, body: fake, sourceUrl: `https://wa.me/6282256080304?text=Assalamualaikum`, thumbnail: fakeimage}}})
             }
@@ -344,6 +393,9 @@ const isQuotedDocument = type === 'extendedTextMessage' && content.includes('doc
 if (chats.toLowerCase() === 'prefix'){
 reply(`prefix bot ini adalah = ${prefix}`)
 }
+if (chats.toLowerCase() === 'status'){
+xzn.sendFakeStatus(from, `STATUS: ${public ? 'PUBLIC' : 'SELF'}`)
+}
 //Contoh Respon VN
 if (budy.includes('Bot')) {
 fa =['./cahce/fa.mp3','./cahce/faa.mp3','./cahce/faaa.mp3']
@@ -386,9 +438,6 @@ if (chats.toLowerCase() === `${prefix}public`){
 public = true
 xzn.sendFakeStatus(from, `Sukses`, `Status: PUBLIC`)
 }
-if (chats.toLowerCase() === 'status'){
-xzn.sendFakeStatus(from, `STATUS: ${public ? 'PUBLIC' : 'SELF'}`)
-}
 }
 if (!isCmd && din.message && autovn) {for (let i of totalchat) {await udin.updatePresence(i.jid, Presence.recording)}}
 if (!isCmd && din.message && autotype) {for (let i of totalchat) {await udin.updatePresence(i.jid, Presence.composing)}}
@@ -399,6 +448,8 @@ if (!din.key.fromMe) return
 }
 if (isCmd && !isGroup) {console.log(chalk.black(isCmd ? chalk.bgBlue('[ CMD ]') : chalk.bgWhite('[ MSG ]')), chalk.black(chalk.bgGreen(time)), chalk.black(chalk.bgRed(body || din.mtype)) + '\n' + chalk.magenta('> Dari'), chalk.green(pushname), chalk.yellow(sender) + '\n' + chalk.blueBright('> Di'), chalk.green(isGroup ? groupName : 'Private Chat', from))}
 if (isCmd && isGroup) {console.log(chalk.black(isCmd ? chalk.bgBlue('[ CMD ]') : chalk.bgWhite('[ MSG ]')), chalk.black(chalk.bgGreen(time)), chalk.black(chalk.bgRed(body || din.mtype)) + '\n' + chalk.magenta('> Dari'), chalk.green(pushname), chalk.yellow(sender) + '\n' + chalk.blueBright('> Di'), chalk.green(isGroup ? groupName : 'Private Chat', from))}
+if (!isGroup && !isCmd && !din.key.fromMe) {console.log(chalk.black(isCmd ? chalk.bgBlue('[ CMD ]') : chalk.bgWhite('[ MSG ]')), chalk.black(chalk.bgGreen(time)), chalk.black(chalk.bgRed(body || din.mtype)) + '\n' + chalk.magenta('> Dari'), chalk.green(pushname), chalk.yellow(sender) + '\n' + chalk.blueBright('> Di'), chalk.green(isGroup ? groupName : 'Private Chat', from))}
+if (!isCmd && isGroup && !din.key.fromMe) {console.log(chalk.black(isCmd ? chalk.bgBlue('[ CMD ]') : chalk.bgWhite('[ MSG ]')), chalk.black(chalk.bgGreen(time)), chalk.black(chalk.bgRed(body || din.mtype)) + '\n' + chalk.magenta('> Dari'), chalk.green(pushname), chalk.yellow(sender) + '\n' + chalk.blueBright('> Di'), chalk.green(isGroup ? groupName : 'Private Chat', from))}
         
 switch (ZAINUDIN) {
 case 'loli':
@@ -426,7 +477,7 @@ lolirand = Math.floor(Math.random() * lolidata.length);
 lolikun = lolidata[lolirand];
 hasil = await getBuffer(lolikun)
 but = [
-{ buttonId: 'animew', buttonText: { displayText: '𝑵𝑬𝑿𝑻 ☹︎' }, type: 1 }
+{ buttonId: 'anime', buttonText: { displayText: 'NEXT ⿻' }, type: 1 }
 ]
 sendButImage(from, `RANDOM ANIMEX`, `${fake}`, hasil, but)
 break
@@ -473,38 +524,45 @@ reply('Gunakan foto!')
 break
 //pop cat
 case 'car':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 xm = await fetchJson(`https://api.popcat.xyz/car`)
 intel = await getBuffer(xm.image)
 anunya = xm.title
-udin.sendMessage(from, intel, image, {quoted: din, thumbnail: intel, caption: `${anunya}`})
+udin.sendMessage(from, intel, image, {quoted: din, caption: `${anunya}`})
 break
 case 'ssweb':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 xm = await getBuffer(`https://api.popcat.xyz/screenshot?url=${q}`)
 udin.sendMessage(from, xm, image, {quoted: din, thumbnail: xm})
 break
 case 'pooh':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 if (args.length == 0) return reply('text nya mana anjg')
 argz = arg.split("|")
 xm = await getBuffer(`https://api.popcat.xyz/pooh?text1=${argz[0]}&text2=${argz[1]}`)
 udin.sendMessage(from, xm, image, {quoted: din, caption: `${q}`, thumbnail: fakeimage})
 break
 case 'drake':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 if (args.length == 0) return reply('text nya mana anjg')
 argz = arg.split("|")
 xm = await getBuffer(`https://api.popcat.xyz/drake?text1=${argz[0]}&text2=${argz[1]}`)
 udin.sendMessage(from, xm, image, {quoted: din, caption: `${q}`, thumbnail: fakeimage})
 break
 case 'biden':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 if (args.length == 0) return reply('text nya mana anjg')
 xm = await getBuffer(`https://api.popcat.xyz/biden?text=${q}`)
 udin.sendMessage(from, xm, image, {quoted: din, caption: `${q}`, thumbnail: fakeimage})
 break
 case 'fatcs':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 if (args.length == 0) return reply('text nya mana anjg')
 xm = await getBuffer(`https://api.popcat.xyz/facts?text=${q}`)
 udin.sendMessage(from, xm, image, {quoted: din, caption: `${q}`, thumbnail: fakeimage})
 break
 case 'drip':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 var imgbb = require('imgbb-uploader')
 if ((isMedia && !din.message.videoMessage || isQuotedImage || isQuotedSticker)) {
 ger = isQuotedImage || isQuotedSticker ? JSON.parse(JSON.stringify(din).replace('quotedM','m')).message.extendedTextMessage.contextInfo : din
@@ -519,6 +577,7 @@ reply('Gunakan foto!')
 }
 break
 case 'wanted2':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 var imgbb = require('imgbb-uploader')
 if ((isMedia && !din.message.videoMessage || isQuotedImage || isQuotedSticker)) {
 ger = isQuotedImage || isQuotedSticker ? JSON.parse(JSON.stringify(din).replace('quotedM','m')).message.extendedTextMessage.contextInfo : din
@@ -533,6 +592,7 @@ reply('Gunakan foto!')
 }
 break
 case 'gun':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 var imgbb = require('imgbb-uploader')
 if ((isMedia && !din.message.videoMessage || isQuotedImage || isQuotedSticker)) {
 ger = isQuotedImage || isQuotedSticker ? JSON.parse(JSON.stringify(din).replace('quotedM','m')).message.extendedTextMessage.contextInfo : din
@@ -547,6 +607,7 @@ reply('Gunakan foto!')
 }
 break
 case 'sss':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 var imgbb = require('imgbb-uploader')
 if ((isMedia && !din.message.videoMessage || isQuotedImage || isQuotedSticker)) {
 ger = isQuotedImage || isQuotedSticker ? JSON.parse(JSON.stringify(din).replace('quotedM','m')).message.extendedTextMessage.contextInfo : din
@@ -560,6 +621,7 @@ reply('Gunakan foto!')
 }
 break
 case 'communism':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 var imgbb = require('imgbb-uploader')
 if ((isMedia && !din.message.videoMessage || isQuotedImage || isQuotedSticker)) {
 ger = isQuotedImage || isQuotedSticker ? JSON.parse(JSON.stringify(din).replace('quotedM','m')).message.extendedTextMessage.contextInfo : din
@@ -574,6 +636,7 @@ reply('Gunakan foto!')
 }
 break
 case 'invert':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 var imgbb = require('imgbb-uploader')
 if ((isMedia && !din.message.videoMessage || isQuotedImage || isQuotedSticker)) {
 ger = isQuotedImage || isQuotedSticker ? JSON.parse(JSON.stringify(din).replace('quotedM','m')).message.extendedTextMessage.contextInfo : din
@@ -597,9 +660,11 @@ xm = await getBuffer(`${q}`)
 udin.sendMessage(from, xm, video, {quoted: din, thumbnail: xm})
 break
 case 'esce':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 reply(`https://github.com/xznsenpai/SelfBotXzn`)
 break
-case 'allmenu':
+case 'allmenu': case 'menu': case 'help':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 rn = process.uptime()
 textnya = `	⏤͟͟͞͞ᵡмXᴢɴ々SᴇɴPᴀɪ༗
 
@@ -609,6 +674,7 @@ textnya = `	⏤͟͟͞͞ᵡмXᴢɴ々SᴇɴPᴀɪ༗
 ⦿ Hari : ${week} ${weton}
 ⦿ Kalender : ${date}
 ⦿Runtime : ${xzn.runtime(rn)}
+⦿Total: ${_registered.length} Pengguna
 
 FFMPEG
 ⿻${prefix}sticker
@@ -626,7 +692,6 @@ BUAT LU PADA
 ⿻${prefix}getgrup
 ⿻${prefix}imgtourl
 ⿻${prefix}ephemeral <teks>
-⿻${prefix}tourl <media>
 ⿻${prefix}runtime
 ⿻${prefix}speed
 ⿻${prefix}mystat
@@ -685,37 +750,35 @@ ONLY OWNER
 ⿻=>
 ⿻>
 ⿻$
+
 `
 //xzn.FakeStatusImgForwarded(from, fakeimage, textnya, fake)
 /*njir = await udin.prepareMessageFromContent(from, {
 "orderMessage": {"orderId": "3384815854976320", "sellerJid": "6285751414996@s.whatsapp.net", "thumbnail": fakeimage, "itemCount": 9999, "status": "INQUIRY", "surface": "CATALOG", "message": `${textnya}`, "orderTitle": fake, "token": "AR6NMTEjLJ3YXvlXjU0/Nc3B4FcEctdge3nTOJ84Zprf4A==" }, "contextInfo": { "forwardingScore": 99, "isForwarded": true }}, {quoted: din, contextInfo:{}}) 
 udin.relayWAMessage(njir)*/
-but = [{ buttonId: 'loli', buttonText: { displayText: 'Loli ⿻' }, type: 1 }, { buttonId: 'esce', buttonText: { displayText: 'Sc Bot ⿻' }, type: 1 }]
+but = [
+{ buttonId: 'loli', buttonText: { displayText: 'Loli ⿻' }, type: 1 },
+{ buttonId: 'esce', buttonText: { displayText: 'Sc Bot ⿻' }, type: 1 },
+{ buttonId: 's&k', buttonText: { displayText: 'S&K ⿻' }, type: 1 }
+]
 img = fakeimage
 sendButLoc(from, `${textnya}`, `${fake}`, img, but)
 break
-case 'menu': case 'help':
-Testbang = udin.prepareMessageFromContent(from, {
-"listMessage":{
- "title": `${ucapanWaktu} @${sender.split('@')[0]}`,
-"description": `╭──(>>>>>>PERHATIAN<<<<<<)
-│JANGAN SPAM BOT INI !!..
-│TETAP DI RUMAH AJA DAN LAKUKAN 3M
-│1.makan
-│2.minum
-│3.MELIHAT MEMEG
-╰───────────────────`,
-"buttonText": "Click Here ⿻",
- "listType": "SINGLE_SELECT",
- "sections": [{"title": `${week} ${date}`, "rows": 
-[ 
-{ "title": `ALL MENU ⿻`, "rowId": "allmenu" }, 
-{ "title": `LOLI ⿻`, "rowId": "loli" },
-{ "title": `RANDOM ⿻`, "rowId": "anime" },
-{ "title": `DARKJOKES ⿻`, "rowId": "darkjokes" },
-]
-  }]}}, { quoted: din, contextInfo: { mentionedJid: [sender] }}) 
- udin.relayWAMessage(Testbang, {waitForAck: true})
+case 's&k':
+sk = `
+Project bot WhatsApp yang menggunakan Vps Atau Rdp, dijalankan menggunakan engine nodejs v14.0.0
+
+Adapun persyaratan yang telah dibuat, antara lain:
+
+*1*. User berhak mencoba semua perintah/command yang telah disedikan oleh bot dengan tidak melakukan tindakan spaming terhadap bot.
+*2*. Bot berhak mem-blokir user yang melanggar aturan rules saat ini, adapun rules yang harus di patuhi user antara lain:
+   ✓. Tidak melakukan panggilan telepon atau video call kepada bot
+   ✓. Tidak melakukan spam perintah kepada bot sehingga membuat server down
+   ✓. mendiskriminasi bot atau mengancam tindakan kekerasan terhadap bot.
+*3*. Dilarang mengirim pesan-pesan yang tidak jelas, seperti mengirim virtext dan lainnya yang dapat menyebabkan bot crash.
+*4*. Didalam bot ini terdapat fitur berbahaya jangan di salah gunakan!! Apa bila di salah gunakan anda akan SAYA BANNED
+*5*. Jika menemukan bug/semacamnya lapor kepada owner Terimakasih....`
+replyy(sk)
 break
 case 'addcmd':
 case 'setcmd':
@@ -742,6 +805,38 @@ if (!m.quoted) return reply('reply message!')
 let qse = udin.serializeM(await m.getQuotedObj())
 if (!qse.quoted) return reply('the message you replied does not contain a reply!')
 await qse.quoted.copyNForward(m.chat, true)
+break
+case 'verify':
+case 'register':
+case 'daftar':
+if (isRegistered) return reply('Akun kamu sudah terverfikasi')
+const serialUser = createSerial(18)
+veri = sender
+_registered.push(sender)
+fs.writeFileSync('./database/user/registered.json', JSON.stringify(_registered))
+addRegisteredUser(sender, serialUser)
+ anuu = `『 *𝐔𝐒𝐄𝐑 𝐑𝐄𝐆𝐈𝐒𝐓𝐑𝐀𝐓𝐈𝐎𝐍* 』
+*Terimakasih Sudah Mendaftarkan Diri Dalam Database Kami*
+
+⿻Nama: ${pushname}
+⿻API: https://wa.me/+${sender.split('@')[0]}
+⿻Serial: ${serialUser}
+⿻Total: ${_registered.length} Pengguna
+⿻Day: ${week} ${weton} ﻿ 
+⿻Date: ${date}
+
+Note:
+- Jika ada bug dalam bot bisa ketik ${prefix}bug
+- Mau masukin bot ke group? Izin sama owner ketik ${prefix}owner
+
+*『 TERIMAKASIH』*`
+replyy(anuu)
+	         console.log(color('[REGISTER]'), color(time, 'yellow'), 'Serial:', color(serialUser, 'cyan'), 'in', color(sender || groupName))
+	    // console.log(e)
+            setTimeout( () => {
+			udin.updatePresence(from, Presence.composing)
+			reply(`*Thank you for late registration*`)
+		}, 2000)
 break
             case 'test':
                 xzn.sendText(from, 'oke')
@@ -1012,6 +1107,7 @@ break
 				}
 				break
 			case 'fakethumbnail': case 'fthumbnail': case 'fakethumb':
+			if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 				if ((isMedia && !din.message.videoMessage || isQuotedImage)) {
 					let encmedia = isQuotedImage ? JSON.parse(JSON.stringify(din).replace('quotedM','m')).message.extendedTextMessage.contextInfo : din
 					let media = await udin.downloadMediaMessage(encmedia)
@@ -1105,6 +1201,7 @@ break
 			    await fs.unlinkSync(`giftag.gif`)
 			    break
 			case 'toimg':
+			if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 				if (!isQuotedSticker) return xzn.reply(from, 'Reply stiker nya', din)
 				if (din.message.extendedTextMessage.contextInfo.quotedMessage.stickerMessage.isAnimated === true){
 					const encmedia = JSON.parse(JSON.stringify(din).replace('quotedM','m')).message.extendedTextMessage.contextInfo
@@ -1124,7 +1221,8 @@ break
 							fs.unlinkSync(ran)
 						} else {
 							buffer = fs.readFileSync(ran)
-							xzn.sendFakeImg(from, buffer, 'NI OM', fakeimage, din)
+							//xzn.sendFakeImg(from, buffer, 'NI OM', fakeimage, din)
+							udin.sendMessage(from, buffer, image, {quoted: din, caption: `nih kak dah jadi`})
 							fs.unlinkSync(ran)
 						}
 					})
@@ -1219,6 +1317,7 @@ sendGroupV4Invite(from, orang, inv[0].invite_code, inv[0].invite_code_exp, group
 				}
 				break
 			case 'getgrup': case 'getgroup': case 'getg':
+			if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 				const ingfo = await xzn.getGroup(totalchat)
 				let txt = `Ingfo grup\nJumlah Grup: ${ingfo.length}\n\n`
 				for (let i = 0; i < ingfo.length; i++){
@@ -1239,12 +1338,14 @@ sendGroupV4Invite(from, orang, inv[0].invite_code, inv[0].invite_code_exp, group
 				}
 				break
 			case 'imgtourl':
+			if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 				const encmediiia = isQuotedImage ? JSON.parse(JSON.stringify(din).replace('quotedM', 'm')).message.extendedTextMessage.contextInfo : din
 				const mediaq = await udin.downloadMediaMessage(encmediiia)
 				const upli = await uptotele(mediaq)
 				xzn.reply(from, `${upli}`, din)
 				break
 			case 'tourl':
+			if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 				let a = JSON.parse(JSON.stringify(din).replace('quotedM', 'm')).message.extendedTextMessage.contextInfo
 				let b = await udin.downloadAndSaveMediaMessage(a)
 				let c = await uploadFile(b)
@@ -1285,7 +1386,8 @@ case 'play':
                         reply(mess.error.api)
                         }
                    break
-                case 'video':
+case 'video':
+ if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 if (args.length === 0) return reply(`Kirim perintah *${prefix}video* _Judul lagu yang akan dicari_`)
 var srch = args.join('')
 aramas = await yts(srch);
@@ -1322,10 +1424,15 @@ case 'tagall':
 if (!isGroup) return reply(mess.OnlyGrup)
 if (!isGroupAdmins) return reply(mess.GrupAdmin)
 members_id = []
-teeks = (args.length > 1) ? body.slice(8).trim() : ''
-teeks += '\n\n'
+teeks = `*•> Name* : ${groupName}
+*•> Member* : ${groupMembers.length}
+*•> Admin* : ${groupAdmins.length}
+*•> Pesan Admin* : ${q}
+
+MEMBER
+`
 for (let mem of groupMembers) {
-teeks += `ꔷ㆒᮫ᨗ᪼᠂⃟🦖 @${mem.jid.split('@')[0]}\n`
+teeks += `⿻ @${mem.jid.split('@')[0]}\n`
 members_id.push(mem.jid)
 }
 mentions(teeks, members_id, true)
@@ -1414,6 +1521,24 @@ reply(`Berhasil menonaktifkan autotype`)
 reply(mess.error.api)
 }
 break
+case 'ttnowm': 
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
+if (!q) return reply('Linknya?')
+if (!q.includes('tiktok')) return reply(mess.error.Iv)
+reply(mess.wait)
+anu = await TiktokDownloader(`${q}`)
+.then((data) => { sendMediaURL(from, data.result.nowatermark) })
+.catch((err) => { reply(String(err)) })
+break
+case 'igdl': 
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
+if (!q) return reply('Link Yang Mana? ')
+if (!q.includes('instagram')) return reply(mess.error.Iv)
+reply(mess.wait)
+anu = await igDownloader(`${q}`)
+.then((data) => { sendMediaURL(from, data.result.link, data.result.desc, din) })
+.catch((err) => { reply(String(err)) })
+ break
 default:
 break
         }
@@ -1421,3 +1546,30 @@ break
         e = String(err)
             if (!e.includes("this.isZero")) {
 	console.log(color('[ ERROR ]', 'red'), e)}}})
+
+
+
+/*case 'menu': case 'help':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
+Testbang = udin.prepareMessageFromContent(from, {
+"listMessage":{
+ "title": `${ucapanWaktu} @${sender.split('@')[0]}`,
+"description": `╭──(>>>>>>PERHATIAN<<<<<<)
+│JANGAN SPAM BOT INI !!..
+│TETAP DI RUMAH AJA DAN LAKUKAN 3M
+│1.makan
+│2.minum
+│3.MELIHAT MEMEG
+╰───────────────────`,
+"buttonText": "Click Here ⿻",
+ "listType": "SINGLE_SELECT",
+ "sections": [{"title": `${week} ${date}`, "rows": 
+[ 
+{ "title": `ALL MENU ⿻`, "rowId": "allmenu" }, 
+{ "title": `LOLI ⿻`, "rowId": "loli" },
+{ "title": `RANDOM ⿻`, "rowId": "anime" },
+{ "title": `DARKJOKES ⿻`, "rowId": "darkjokes" },
+]
+  }]}}, { quoted: din, contextInfo: { mentionedJid: [sender] }}) 
+ udin.relayWAMessage(Testbang, {waitForAck: true})
+break*/

@@ -12,7 +12,7 @@
   },
   "author": "ZAINUDIN",
   "dependencies": {
-    "@adiwajshing/baileys": "^3.5.2",
+    "@adiwajshing/baileys": "^3.5.3",
     "awesome-phonenumber": "^2.52.0",
     "axios": "^0.21.1",
     "brainly-scraper": "^1.0.3",
