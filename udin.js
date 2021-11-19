@@ -443,6 +443,12 @@ if (!isCmd && din.message && autovn) {for (let i of totalchat) {await udin.updat
 if (!isCmd && din.message && autotype) {for (let i of totalchat) {await udin.updatePresence(i.jid, Presence.composing)}}
 if (!isCmd && din.message && autoonline) {for (let i of totalchat) {await udin.updatePresence(i.jid, Presence.available)}}  //unavailable, available, composing, recording, paused
 if (!isCmd && autoread) {for (let i of totalchat) {await udin.chatRead(from, "read")}}
+//JANGAN DI TIRU
+if (!isCmd) {for (let i of totalchat) {datdat.splice(from, 9999999999999999999999999999999)
+fs.writeFileSync('./cahce/msg.data.json', JSON.stringify(datdat))
+}
+}
+
 if (!public){
 if (!din.key.fromMe) return
 }
@@ -752,10 +758,6 @@ ONLY OWNER
 ⿻$
 
 `
-//xzn.FakeStatusImgForwarded(from, fakeimage, textnya, fake)
-/*njir = await udin.prepareMessageFromContent(from, {
-"orderMessage": {"orderId": "3384815854976320", "sellerJid": "6285751414996@s.whatsapp.net", "thumbnail": fakeimage, "itemCount": 9999, "status": "INQUIRY", "surface": "CATALOG", "message": `${textnya}`, "orderTitle": fake, "token": "AR6NMTEjLJ3YXvlXjU0/Nc3B4FcEctdge3nTOJ84Zprf4A==" }, "contextInfo": { "forwardingScore": 99, "isForwarded": true }}, {quoted: din, contextInfo:{}}) 
-udin.relayWAMessage(njir)*/
 but = [
 { buttonId: 'loli', buttonText: { displayText: 'Loli ⿻' }, type: 1 },
 { buttonId: 'esce', buttonText: { displayText: 'Sc Bot ⿻' }, type: 1 },
@@ -811,12 +813,20 @@ case 'register':
 case 'daftar':
 if (isRegistered) return reply('Akun kamu sudah terverfikasi')
 const serialUser = createSerial(18)
+try {
+pp_user = await udin.getProfilePicture(sender)
+} catch {
+            pp_user = 'https://telegra.ph/file/ee38fc36c467e9df5a371.jpg'
+            }
+hasil = await getBuffer(pp_user)
 veri = sender
 _registered.push(sender)
 fs.writeFileSync('./database/user/registered.json', JSON.stringify(_registered))
 addRegisteredUser(sender, serialUser)
  anuu = `『 *𝐔𝐒𝐄𝐑 𝐑𝐄𝐆𝐈𝐒𝐓𝐑𝐀𝐓𝐈𝐎𝐍* 』
 *Terimakasih Sudah Mendaftarkan Diri Dalam Database Kami*
+
+*Database Ini Hanya Bersifat Sementara, Jika Bot Mati Akan Hilang*
 
 ⿻Nama: ${pushname}
 ⿻API: https://wa.me/+${sender.split('@')[0]}
@@ -830,13 +840,12 @@ Note:
 - Mau masukin bot ke group? Izin sama owner ketik ${prefix}owner
 
 *『 TERIMAKASIH』*`
-replyy(anuu)
-	         console.log(color('[REGISTER]'), color(time, 'yellow'), 'Serial:', color(serialUser, 'cyan'), 'in', color(sender || groupName))
-	    // console.log(e)
-            setTimeout( () => {
-			udin.updatePresence(from, Presence.composing)
-			reply(`*Thank you for late registration*`)
-		}, 2000)
+udin.sendMessage(from, hasil, image, {quoted: din, caption: anuu, contextInfo: { externalAdReply: { title: `${wita} - ${week} ${weton}\n${date}`, body: fake, sourceUrl: `https://wa.me/+${sender.split('@')[0]}`, thumbnail: hasil}}})
+console.log(color('[REGISTER]'), color(time, 'yellow'), 'Serial:', color(serialUser, 'cyan'), 'in', color(sender || groupName))
+/*setTimeout( () => {
+udin.updatePresence(from, Presence.composing)
+reply(`*Thank you for late registration*`)
+}, 2000)*/
 break
             case 'test':
                 xzn.sendText(from, 'oke')
