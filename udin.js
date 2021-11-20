@@ -33,6 +33,7 @@ const imgbb = require('imgbb-uploader')
 const yts = require( 'yt-search')
 const { yta, ytv, igdl, upload, uploadImages } = require('./src/ytdl')
 const { webp2gifFile, igDownloader, TiktokDownloader } = require("./src/gif.js")
+//const { isFiltered, msgFilter, addFilter } = require("./src/antispam.js")
 let chalk = require('chalk')
 const crypto = require('crypto')
 //dan jadilah recode base ini
@@ -459,6 +460,7 @@ if (!isCmd && isGroup && !din.key.fromMe) {console.log(chalk.black(isCmd ? chalk
         
 switch (ZAINUDIN) {
 case 'loli':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 loli = await getBuffer(`http://hadi-api.herokuapp.com/api/loli`)
 but = [
 { buttonId: 'loli', buttonText: { displayText: 'NEXT ⿻' }, type: 1 }
@@ -466,6 +468,7 @@ but = [
 sendButImage(from, `LOLI NYA KAK`, `${fake}`, loli, but)
 break
 case 'darkjokes':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 data = fs.readFileSync('./src/darkjokes.js');
 jsonData = JSON.parse(data);
 randIndex = Math.floor(Math.random() * jsonData.length);
@@ -477,6 +480,7 @@ but = [
 sendButImage(from, `AWOKWOK DARK COK`, `${fake}`, hasil, but)
 break
 case 'anime':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 loli = fs.readFileSync('./src/loli.js');
 lolidata = JSON.parse(loli);
 lolirand = Math.floor(Math.random() * lolidata.length);
@@ -488,6 +492,7 @@ but = [
 sendButImage(from, `RANDOM ANIMEX`, `${fake}`, hasil, but)
 break
 case 'random':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 but = [
 { buttonId: 'loli', buttonText: { displayText: ' Loli ⿻' }, type: 1 },
 { buttonId: 'anime', buttonText: { displayText: 'Anime ⿻' }, type: 1 },
@@ -499,6 +504,7 @@ break
 case 'pinterest':
 case 'p':
 if (!q) return reply('yg mau di cari apa?')
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 pinterest(`${q}`).then( data => {
 const amsulah = data.result
 const pimterest = amsulah[Math.floor(Math.random() * amsulah.length)]
@@ -506,12 +512,14 @@ sendMediaURL (from ,pimterest , `Pinterest : ${q}`)
 })
 break
 case 'panda':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 xm = await fetchJson(`https://some-random-api.ml/animal/red_panda`)
 hasil = await getBuffer(xm.image)
 capnya = (xm.fact)
 udin.sendMessage(from, hasil, image, {quoted: din, thumbnail: Buffer.alloc(0), caption: `${capnya}`})
 break
 case 'smeme': case 'stickmeme': case 'sm':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
 top = arg.split('|')[0]
 bottom = arg.split('|')[1]
 var imgbb = require('imgbb-uploader')
@@ -725,6 +733,10 @@ IMAGE MAKER
 DOWNLOAD MENU
 ⿻${prefix}play
 ⿻${prefix}video
+⿻${prefix}igdl
+⿻${prefix}ttnowm
+⿻${prefix}ytmp4
+⿻${prefix}ytmp3
 
 CMD STICKER
 ⿻${prefix}setcmd
@@ -847,6 +859,74 @@ udin.updatePresence(from, Presence.composing)
 reply(`*Thank you for late registration*`)
 }, 2000)*/
 break
+case 'ytmp4':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
+if (args.length === 0) return reply(`Kirim perintah *${prefix}ytmp4 [linkYt]*`)
+let isLinks2 = args[0].match(/(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/)
+if (!isLinks2) return reply(mess.error.Iv)
+try {
+reply(mess.wait)
+ytv(args[0])
+.then((res) => {
+const { dl_link, thumb, title, filesizeF, filesize } = res
+axios.get(`https://tinyurl.com/api-create.php?url=${dl_link}`)
+.then((a) => {
+if (Number(filesize) >= 40000) return sendMediaURL(from, thumb, `*YTMP 4!*\n\n*Title* : ${title}\n*Ext* : MP3\n*Filesize* : ${filesizeF}\n*Link* : ${a.data}\n\n_Untuk durasi lebih dari batas disajikan dalam mektuk link_`)
+const captionsYtmp4 = `*Data Berhasil Didapatkan!*\n\n*Title* : ${title}\n*Ext* : MP4\n*Size* : ${filesizeF}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
+sendMediaURL(from, thumb, captionsYtmp4)
+sendMediaURL(from, dl_link).catch(() => reply(mess.error.api))
+})		
+})
+} catch (err) {
+reply(mess.error.api)
+}
+break
+case 'ytmp3':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
+if (args.length === 0) return reply(`Kirim perintah *${prefix}ytmp3 [linkYt]*`)
+let isLinks = args[0].match(/(?:https?:\/{2})?(?:w{3}\.)?youtu(?:be)?\.(?:com|be)(?:\/watch\?v=|\/)([^\s&]+)/)
+if (!isLinks) return reply(mess.error.Iv)
+try {
+reply(mess.wait)
+yta(args[0])
+.then((res) => {
+const { dl_link, thumb, title, filesizeF, filesize } = res
+axios.get(`https://tinyurl.com/api-create.php?url=${dl_link}`)
+.then((a) => {
+if (Number(filesize) >= 30000) return sendMediaURL(from, thumb, `*Data Berhasil Didapatkan!*\n\n*Title* : ${title}\n*Ext* : MP3\n*Filesize* : ${filesizeF}\n*Link* : ${a.data}\n\n_Untuk durasi lebih dari batas disajikan dalam mektuk link_`)
+const captions = `*YTMP3*\n\n*Title* : ${title}\n*Ext* : MP3\n*Size* : ${filesizeF}\n\n_Silahkan tunggu file media sedang dikirim mungkin butuh beberapa menit_`
+sendMediaURL(from, thumb, captions)
+sendMediaURL(from, dl_link).catch(() => reply(mess.error.api))
+})
+})
+} catch (err) {
+reply(mess.error.api)
+}
+break
+case 'ytsearch':
+if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
+if (args.length < 1) return reply('Tolong masukan query!')
+var srch = args.join('');
+try {
+var aramas = await yts(srch);
+} catch {
+return await udin.sendMessage(from, 'Error!', MessageType.text, dload)
+}
+aramat = aramas.all 
+var tbuff = await getBuffer(aramat[0].image)
+var ytresult = '';
+ytresult += '「 *YOUTUBE SEARCH* 」'
+ytresult += '\n________________________\n\n'
+aramas.all.map((video) => {
+ytresult += '❏ Title: ' + video.title + '\n'
+ytresult += '❏ Link: ' + video.url + '\n'
+ytresult += '❏ Durasi: ' + video.timestamp + '\n'
+ytresult += '❏ Upload: ' + video.ago + '\n________________________\n\n'
+});
+ytresult += `◩ ${fake}`
+//await fakethumb(tbuff,ytresult)
+udin.sendMessage(from, tbuff, image, {quoted: din, caption: ytresult})
+break 
             case 'test':
                 xzn.sendText(from, 'oke')
 				break
@@ -1549,6 +1629,13 @@ anu = await igDownloader(`${q}`)
 .catch((err) => { reply(String(err)) })
  break
 default:
+// Cmd Anti Spam 
+/*if (isCmd && msgFilter.isFiltered(from) && !isGroup) {
+console.log('[\x1b[1;31m SPAM \x1b[1;37m]', time, color(`${command}`), color(sender.split('@')[0]), '/', color(pushname), 'args :', color(args.length))
+teksnya = `@${sender.split('@')[0]} Spam Detected\n${a}Please Wait 5 Seconds :)`
+return udin.sendMessage(from, teksnya, MessageType.text) 
+            }
+if (isCmd) msgFilter.addFilter(from)*/
 break
         }
     } catch (err) {
