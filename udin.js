@@ -48,9 +48,17 @@ const axios = require('axios');
 const Exif = require('./lib/exif');
 const { uptotele, uptonaufal, uploadFile } = require('./lib/uploadimage')
 const exif = new Exif();
-
 conn.connect()
 const udin = conn.udin
+
+const vcard = 'BEGIN:VCARD\n' 
+            + 'VERSION:3.0\n' 
+            + 'FN:Owner Kawaii\n'
+            + 'nitem1.TEL;waid=6285751414996:+62 857-5141-4996\n'
+            + 'item1.X-ABLabel:Ponsel\n'
+            + 'X-WA-BIZ-DESCRIPTION: Bukan Senpai\n'
+            + 'X-WA-BIZ-NAME:Its_me_xzn\n'
+            + 'END:VCARD'
 
 fake = "⏤͟͟͞͞ᵡмXᴢɴ々SᴇɴPᴀɪ༗"
 fakeimage = fs.readFileSync("./media/foto.jpg")
@@ -75,6 +83,7 @@ const datdat = JSON.parse(fs.readFileSync('./cahce/msg.data.json'))
 let _scommand = JSON.parse(fs.readFileSync('./scommand.json'));
 let _registered = JSON.parse(fs.readFileSync('./database/user/registered.json'))
 let register = JSON.parse(fs.readFileSync('./database/user/registered.json'))
+const audionye = JSON.parse(fs.readFileSync('./src/audio.json'))
 
 udin.on('CB:Blocklist', json => {
 	if (blocked.length > 2) return
@@ -396,6 +405,12 @@ reply(`prefix bot ini adalah = ${prefix}`)
 }
 if (chats.toLowerCase() === 'status'){
 xzn.sendFakeStatus(from, `STATUS: ${public ? 'PUBLIC' : 'SELF'}`)
+}
+for (let anju of audionye){
+if (budy === anju){
+result = fs.readFileSync(`./src/audio/${anju}.mp3`)
+udin.sendMessage(from, result, MessageType.audio, {quoted: din, mimetype: 'audio/mp4', ptt:true})
+}
 }
 //Contoh Respon VN
 if (budy.includes('Bot')) {
@@ -828,8 +843,8 @@ const serialUser = createSerial(18)
 try {
 pp_user = await udin.getProfilePicture(sender)
 } catch {
-            pp_user = 'https://telegra.ph/file/ee38fc36c467e9df5a371.jpg'
-            }
+pp_user = 'https://telegra.ph/file/ee38fc36c467e9df5a371.jpg'
+}
 hasil = await getBuffer(pp_user)
 veri = sender
 _registered.push(sender)
@@ -852,12 +867,18 @@ Note:
 - Mau masukin bot ke group? Izin sama owner ketik ${prefix}owner
 
 *『 TERIMAKASIH』*`
-udin.sendMessage(from, hasil, image, {quoted: din, caption: anuu, contextInfo: { externalAdReply: { title: `${wita} - ${week} ${weton}\n${date}`, body: fake, sourceUrl: `https://wa.me/+${sender.split('@')[0]}`, thumbnail: hasil}}})
+//udin.sendMessage(from, hasil, image, {quoted: din, caption: anuu, contextInfo: { externalAdReply: { title: `${wita} - ${week} ${weton}\n${date}`, body: fake, sourceUrl: `https://wa.me/+${sender.split('@')[0]}`, thumbnail: hasil}}})
+but = [
+{ buttonId: 'menu', buttonText: { displayText: 'MENU ⿻' }, type: 1 },
+{ buttonId: 'owner', buttonText: { displayText: 'OWNER ⿻' }, type: 1 }
+]
+sendButImage(from, anuu, `${fake}`, hasil, but)
 console.log(color('[REGISTER]'), color(time, 'yellow'), 'Serial:', color(serialUser, 'cyan'), 'in', color(sender || groupName))
-/*setTimeout( () => {
-udin.updatePresence(from, Presence.composing)
-reply(`*Thank you for late registration*`)
-}, 2000)*/
+break
+case 'owner':
+case 'creator':
+udin.sendMessage(from, {displayname: "Jeff", vcard: vcard}, MessageType.contact, { quoted: din})
+udin.sendMessage(from, 'Tuh nomer owner ku >_<, ingat utamakan salam',MessageType.text, { quoted: din} )
 break
 case 'ytmp4':
 if (!isRegistered) return sendButMessage (from, daftar1, daftar2, daftar3, { quoted: din})
@@ -927,6 +948,31 @@ ytresult += `◩ ${fake}`
 //await fakethumb(tbuff,ytresult)
 udin.sendMessage(from, tbuff, image, {quoted: din, caption: ytresult})
 break 
+case 'addvn':
+			     svst = q
+				if (!svst) return reply('Nama audionya apa su?')
+				boij = JSON.parse(JSON.stringify(din).replace('quotedM', 'm')).message.extendedTextMessage.contextInfo
+				delb = await udin.downloadMediaMessage(boij)
+				audionye.push(`${svst}`)
+				fs.writeFileSync(`./src/audio/${svst}.mp3`, delb)
+				fs.writeFileSync('./src/audio.json', JSON.stringify(audionye))
+				udin.sendMessage(from, `Sukses Menambahkan Vn ke dalam database\nSilahkann Cek dengan cara ${prefix}listvn`, MessageType.text, { quoted: din})
+				break
+			case 'getvn':
+			   if (args.length < 1) return reply('Masukan nama yang terdaftar di list vn')
+				namastc = q
+				buffer = fs.readFileSync(`./src/audio/${namastc}.mp3`)
+				udin.sendMessage(from, buffer, MessageType.audio, {quoted: din, mimetype: 'audio/mp4', ptt:true})
+				break
+			case 'listvn':
+			case 'vnlist':
+				teks = '*List Vn:*\n\n'
+				for (let awokwkwk of audionye) {
+					teks += `- ${awokwkwk}\n`
+				}
+				teks += `\n*Total : ${audionye.length}*`
+				udin.sendMessage(from, teks.trim(), MessageType.text, {  quoted: din, contextInfo: { "mentionedJid": audionye } })
+				break
             case 'test':
                 xzn.sendText(from, 'oke')
 				break
