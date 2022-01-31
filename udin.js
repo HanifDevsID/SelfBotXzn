@@ -74,7 +74,7 @@ autovn = false
 autotype = false
 autoonline = false
 /******** OWNER NUMBER**********/ 
-const ownerNumber = ["6282256080304@s.whatsapp.net"] 
+const ownerNumber = ["6281529467548@s.whatsapp.net"] 
 /*********** LOAD FILE ***********/
 const welkom = JSON.parse(fs.readFileSync('./database/bot/welkom.json'))
 const antilink = JSON.parse(fs.readFileSync('./database/group/antilink.json'))
@@ -356,7 +356,7 @@ Sebelum Menggunakan Bot Verify Terlebih Dahulu Ya `
           },]
 //tes
 const replyy = (teks) => {
-udin.sendMessage(from, teks, text, { quoted: din, contextInfo: { externalAdReply: { title: `${wita} - ${week} ${weton}\n${date}`, body: fake, sourceUrl: `https://wa.me/6282256080304?text=Assalamualaikum`, thumbnail: fakeimage}}})
+udin.sendMessage(from, teks, text, { quoted: din, contextInfo: { externalAdReply: { title: `${wita} - ${week} ${weton}\n${date}`, body: fake, sourceUrl: `https://wa.me/6281529467548?text=Assalamualaikum`, thumbnail: fakeimage}}})
             }
 const fyt = (teks) => {
 udin.sendMessage(from, teks, MessageType.text, {quoted:din, contextInfo:{"externalAdReply":{"title": fake, mediaType: 2, thumbnail: fakeimage, "previewType": "VIDEO","mediaUrl": `https://youtu.be/5odMRQDrhoI`}}})
