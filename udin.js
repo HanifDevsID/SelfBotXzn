@@ -62,7 +62,7 @@ const vcard = 'BEGIN:VCARD\n'
 
 fake = "⏤͟͟͞͞ᵡмXᴢɴ々SᴇɴPᴀɪ༗"
 fakeimage = fs.readFileSync("./media/foto.jpg")
-prefix = 'z'
+prefix = '#'
 blocked = []
 baterai = {
     baterai: 0,
